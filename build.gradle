@@ -29,7 +29,6 @@ allprojects {
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-        maven { url "https://repo.eclipse.org/content/repositories/paho-releases/" }
     }
 }
 
@@ -112,7 +111,6 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
-        compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2"
     }
 }
 
