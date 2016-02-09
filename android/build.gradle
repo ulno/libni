@@ -15,7 +15,7 @@ android {
         instrumentTest.setRoot('tests')
     }
     defaultConfig {
-        applicationId "net.ulno.mqttgamecontroller"
+        applicationId "net.ulno.gamenetcontroller"
         minSdkVersion 8
         targetSdkVersion 23
     }
@@ -68,7 +68,7 @@ task run(type: Exec) {
     }
 
     def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'net.ulno.mqttgamecontroller/AndroidLauncher'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'net.ulno.gamenetcontroller/AndroidLauncher'
 }
 
 // sets up the Android Eclipse project, using the old Ant based build.

@@ -14,9 +14,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 public class Main extends ApplicationAdapter {
-    //public static final String DESTINATION_HOST = "ulno-work";
+    public static final String DESTINATION_HOST = "ulno-work";
 //    public static final String DESTINATION_HOST = "localhost";
-    public static final String DESTINATION_HOST = "192.168.15.194";
+//    public static final String DESTINATION_HOST = "192.168.15.194";
     public static final int DESTINATION_PORT = 19877;
 
     public static final int NUMBER_OF_BUTTONS = 256;
@@ -65,9 +65,10 @@ public class Main extends ApplicationAdapter {
 
     private void send() {
         try {
+            //Gdx.app.log("send","Trying to send.");
             socket.send(datagramPacket);
         } catch (IOException e) {
-            e.printStackTrace();
+            Gdx.app.log("send","Trouble, sending.", e);
         }
     }
 
@@ -196,7 +197,7 @@ public class Main extends ApplicationAdapter {
     @Override
     public void render() {
         frames ++;
-        if(frames > 5) {
+        if(frames > 60) {
             frames = 0;
             send(); // send updates all the time
         }
