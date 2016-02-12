@@ -3,15 +3,22 @@
 # a udp socket
 
 # constants
+#DESTINATION_HOST = "192.168.15.167"; # TODO: move to parameters
+#DESTINATION_HOST = "192.168.43.1"; # TODO: move to parameters
 DESTINATION_HOST = "ulno-work"; # TODO: move to parameters
 # DESTINATION_HOST = "localhost";
 # DESTINATION_HOST = "192.168.15.194";
 DESTINATION_PORT = 19877;
 
 NUMBER_OF_BUTTONS = 256;
-NUMBER_OF_BUTTON_BYTES = (NUMBER_OF_BUTTONS + 7) / 8;
-NUMBER_OF_AXIS = 16;
-NUMBER_OF_AXIS_BYTES = NUMBER_OF_AXIS * 2;
+allocated_buttons = 0;
+NUMBER_OF_ANALOG = 16;
+allocated_analogs = 0;
+
+NO_EVENT = 0
+BUTTON_UP_EVENT = 1
+BUTTON_DOWN_EVENT = 2
+ANALOG_EVENT = 3
 
 import os.path
 import socket
@@ -60,15 +67,17 @@ for sym in KEY_MAPPING:
 # global variables
 finished = False
 frame = 0
-message = bytearray('\00' *(NUMBER_OF_BUTTON_BYTES + NUMBER_OF_AXIS_BYTES))
+
+# allocate send-buffer
+MAX_BUFFER_SIZE = 128
+message = bytearray(MAX_BUFFER_SIZE)
+message_filled = 0
 
 # see if we can load more than standard BMP
 if not pygame.image.get_extended():
     raise SystemExit("Sorry, extended image module required")
 
-
 main_dir = os.path.split(os.path.abspath(__file__))[0]
-
 
 def load_image(file):
     "loads an image, prepares it for play"
@@ -87,31 +96,35 @@ def load_images(*files):
     return imgs
 
 
-def set_key_in_message(nr, pressed):
-    if isinstance(nr, str):
-        nr = ord(nr)
-    byte_nr = nr / 8
-    bit_nr = nr % 8
-    if pressed:
-        message[byte_nr] |= (1 << bit_nr)
-    else:
-        message[byte_nr] &= (255 - (1<<bit_nr))
-
-
 def send_message():
     global message
-    sock.sendto(message, (DESTINATION_HOST, DESTINATION_PORT))
+#    print "Sending", message_filled, "bytes:",repr(message)
+    sock.sendto(message[0:message_filled], (DESTINATION_HOST, DESTINATION_PORT))
 
+def add_key_to_message(nr, pressed):
+    global message, message_filled
+    if isinstance(nr, str):
+        nr = ord(nr)
+    if message_filled > MAX_BUFFER_SIZE-3:
+        raise "Not enough space in buffer."
+    if pressed:
+        message[message_filled] = BUTTON_DOWN_EVENT
+    else:
+        message[message_filled] = BUTTON_UP_EVENT
+    message_filled += 1
+    message[message_filled] = nr
+    message_filled += 1
 
 def read_send_keys():
-    global message, reverse_keymap
+    global message, reverse_keymap, message_filled
+    message_filled = 0
     keystate = pygame.key.get_pressed()
     for key in reverse_keymap:
         # check if any of tehm is pressed
         pressed = False
         for sym in reverse_keymap[key]:
             pressed |= keystate[sym] != 0
-        set_key_in_message(key, pressed)
+        add_key_to_message(key, pressed)
     send_message()
 
 
