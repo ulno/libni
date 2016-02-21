@@ -1,0 +1,10 @@
+# Network Game Controller (NeGaCo) Client description
+id: 0x00000001 # 4 byte client id
+protocol: 1 # protocol version 0: bit block, 1: list of events
+# udp,tcp, or mqtt, format: type://host:port/mqtt-topic (omit topic for udp and tcp)
+# port can be omitted for mqtt
+destination: udp://ulno-work:19877
+#destination: udp://192.168.15.167:19877
+#destination: udp://192.168.43.1:19877
+#destination: udp://localhost:19877
+#destination: udp://192.168.15.194:19877
