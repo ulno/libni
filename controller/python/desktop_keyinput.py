@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # This small python program allows to forward keyboard input to
-# a udp socket
+# a network socket
 
 ####### constants for configuration
 CLIENT_ID =  "\0\0\0\1"
@@ -31,7 +31,7 @@ KEY_MAPPING = {
 }
 
 ####### basic constants for program frmo simple types
-CONFIG_FILE = "negaco_client_config.yaml"
+CONFIG_FILE = "config.yaml"
 MAGIC = "GNCT" # magic identifier for Game Network ConTroller
 PROTOCOL_VERSION = 1;
 NUMBER_OF_BUTTONS = 256;
