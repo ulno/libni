@@ -1,4 +1,3 @@
-############ generic options for gradle and Java ########
 # Unix-stuff
 *~
 .*.swp
@@ -23,9 +22,11 @@ www-test/
 .gwt-tmp/
 
 ## Android Studio and Intellij and Android in general
+android/libs/arm64-v8a/
 android/libs/armeabi/
 android/libs/armeabi-v7a/
 android/libs/x86/
+android/libs/x86_64/
 android/gen/
 .idea/
 *.ipr
@@ -108,20 +109,19 @@ ipch/
 libgdx-*.zip
 libgdx-*.zip.MD5
 
-/.idea/
+.idea/
 
 #core & extension libs/ folders that have no 3rd party dependencies in them
-/gdx/libs
-/backends/gdx-backend-jglfw/libs/
-/backends/gdx-backend-robovm/libs/
-/extensions/gdx-audio/libs/
-/extensions/gdx-box2d/gdx-box2d/libs/
-/extensions/gdx-bullet/libs/
-/extensions/gdx-controllers/gdx-controllers-desktop/libs/
-/extensions/gdx-freetype/libs/
-/extensions/gdx-image/libs/
-/extensions/gdx-setup/gdx-setup.jar
+gdx/libs
+backends/gdx-backend-jglfw/libs/
+backends/gdx-backend-robovm/libs/
+extensions/gdx-audio/libs/
+extensions/gdx-box2d/gdx-box2d/libs/
+extensions/gdx-bullet/libs/
+extensions/gdx-controllers/gdx-controllers-desktop/libs/
+extensions/gdx-freetype/libs/
+extensions/gdx-image/libs/
+extensions/gdx-setup/gdx-setup.jar
 
 #ensure gdx-setup.jar works properly
-!/extensions/gdx-setup/src/com/badlogic/gdx/setup/resources/gwt/war
-
+!extensions/gdx-setup/src/com/badlogic/gdx/setup/resources/gwt/war
