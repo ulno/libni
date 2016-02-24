@@ -15,7 +15,7 @@ const char * DESTINATION_HOST = "ulno-work";
 //const char* DESTINATION_HOST = "192.168.15.194";
 int DESTINATION_PORT = 19877;
 
-const char *MAGIC = "GNCT"; // magic identifier for Game Network Controller
+const char *MAGIC = "LBNI"; // magic identifier for Game Network Controller
 const int PROTOCOL_VERSION = 1;
 const int NUMBER_OF_BUTTONS = 256;
 const int NUMBER_OF_BUTTON_BYTES = (NUMBER_OF_BUTTONS + 7)/8;
@@ -31,10 +31,10 @@ const int STATUS_LED = 16;
 
 void newButton( unsigned char code, int pin, bool pullup );
 void initAllButtons() {
-  newButton( 'w', 15, false ); // up
-  newButton( 'a', 12, true ); // left
-  newButton( 's',  5, true ); // down
-  newButton( 'd', 13, true ); // right
+  newButton( 16, 15, false ); // up
+  newButton(  2, 12, true ); // left
+  newButton( 14,  5, true ); // down
+  newButton(  6, 13, true ); // right
   newButton( ' ',  4, true ); // fire
   newButton( 'm',  2, true ); // menu
 }
@@ -71,7 +71,8 @@ void init_header() {
     message[pos] = random(256);
     pos += 1;
   }
-  String CLIENT_ID ="\0\0\0\2";
+  // TODO: check ID construction
+  String CLIENT_ID ="\x00\x00\x00\x02";
   for(int i=0; i<4; i++) {
     message[pos] = CLIENT_ID[i];
     pos += 1;

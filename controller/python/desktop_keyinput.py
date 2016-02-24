@@ -2,6 +2,20 @@
 # This small python program allows to forward keyboard input to
 # a network socket
 
+from enum import Enum
+
+######## Buttons
+class Buttons(Enum):
+    UP = 16 # ctrl-p (Previous)
+    RIGHT = 6 # ctrl-f (Forward)
+    DOWN = 14 # ctrl-n (Next)
+    LEFT = 2  # ctrl-b (Back)
+    ESCAPE = 27 # SPACE
+    FIRE = 32 # SPACE
+    SPACE = 32 # SPACE
+    RETURN = 13 # return
+    ENTER = 13 #return/enter
+
 ####### constants for configuration
 CLIENT_ID =  "\0\0\0\1"
 import pygame # import basic pygame modules
@@ -17,36 +31,36 @@ KEY_MAPPING = {
     K_7: '7',
     K_8: '8',
     K_9: '9',
-    K_RETURN: 13,
-    K_ESCAPE: 27,
+    K_RETURN: Buttons.RETURN.value,
+    K_ESCAPE: Buttons.ESCAPE.value,
     K_SPACE: ' ',
-    K_UP: 'w',
-    K_w: 'w',
-    K_RIGHT: 'd',
-    K_d: 'd',
-    K_DOWN: 's',
-    K_s: 's',
-    K_LEFT: 'a',
-    K_a: 'a'
+    K_UP: Buttons.UP.value,
+    K_w: Buttons.UP.value,
+    K_RIGHT: Buttons.RIGHT.value,
+    K_d: Buttons.RIGHT.value,
+    K_DOWN: Buttons.DOWN.value,
+    K_s: Buttons.DOWN.value,
+    K_LEFT: Buttons.LEFT.value,
+    K_a: Buttons.LEFT.value
 }
 
 ####### basic constants for program frmo simple types
 CONFIG_FILE = "config.yaml"
-MAGIC = "GNCT" # magic identifier for Game Network ConTroller
-PROTOCOL_VERSION = 1;
-NUMBER_OF_BUTTONS = 256;
-NUMBER_OF_ANALOGS = 16;
-NUMBER_OF_BUTTON_BYTES = (NUMBER_OF_BUTTONS + 7) / 8;
-NUMBER_OF_ANALOGS_BYTES = NUMBER_OF_ANALOGS * 2;
+MAGIC = "LBNI" # magic identifier for libni (Library for Network Input)
+PROTOCOL_VERSION = 1
+NUMBER_OF_BUTTONS = 256
+NUMBER_OF_ANALOGS = 16
+NUMBER_OF_BUTTON_BYTES = (NUMBER_OF_BUTTONS + 7) / 8
+NUMBER_OF_ANALOGS_BYTES = NUMBER_OF_ANALOGS * 2
 MAX_BUFFER_SIZE = 128
 BUFFER_HEADER_SIZE=16
+
 
 ######### other IMPORTS
 import os.path
 import socket
 import yaml # for config file
 import urlparse
-from enum import Enum
 import struct
 import random
 
@@ -259,9 +273,9 @@ def main(winstyle = 0):
             if event.type == QUIT:
                 return
             elif event.type == KEYDOWN:
-                read_send_keys();
+                read_send_keys()
             elif event.type == KEYUP:
-                read_send_keys();
+                read_send_keys()
 
         # clear/erase the last drawn sprites
 #        all.clear(screen, background)
