@@ -13,26 +13,31 @@ void setup() {
    digitalWrite(STATUS_LED, LOW);
 
    tb.add_button(BUTTON_ID,5);
+   tb.add_button(BUTTON_ID+1,12);
+   tb.add_button(BUTTON_ID+2,4);
 }
 
 long frames = 0;
 void loop() {
   tb.check();
-  bool t = tb.get_button(BUTTON_ID)==1;
-  if(t) {
+  if(tb.get_button(BUTTON_ID)) {
     digitalWrite(STATUS_LED, LOW);
   } else {
     digitalWrite(STATUS_LED, HIGH);
   }
   frames ++;
-  if(frames > 10) {
+  if(frames > 100) {
     frames = 0;
-    if(t) {
-      Serial.println("touched");
-    } else {
-      Serial.println("untouched");
+    for( int i = tb.size()-1; i>=0; i-- ) {
+      int state = tb.get_button_state(i);
+      int id = tb.get_button_id(i);
+      Serial.print("ID: ");
+      Serial.print(id);
+      Serial.print(" State: ");
+      Serial.print(state);
+      Serial.print("  ");
     }
+    Serial.println();
   }
-  //  delayMicroseconds(1000);
-  delay(500);
+  delay(1); // increase to debug
 }
