@@ -7,6 +7,7 @@ const char* ssid     = "tulix-upstairs";
 const char* password = "vivalasalsa07";
 
 const char * DESTINATION_HOST = "ulno-work";
+//const char * DESTINATION_HOST = "hoadytotes"; // ben's pc
 //const char* DESTINATION_HOST = "192.168.43.1";
 //const char* DESTINATION_HOST = "192.168.15.167"; // asus phone
 //const char* DESTINATION_HOST = "192.168.15.168"; // note 3 phone
@@ -72,7 +73,7 @@ void init_header() {
     pos += 1;
   }
   // TODO: check ID construction
-  String CLIENT_ID ="\x00\x00\x00\x02";
+  byte CLIENT_ID[4] = {0,0,0,1};
   for(int i=0; i<4; i++) {
     message[pos] = CLIENT_ID[i];
     pos += 1;
