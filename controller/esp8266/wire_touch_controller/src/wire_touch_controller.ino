@@ -4,17 +4,9 @@
 #include "Touch_Buttons.h"
 
 // network related stuff
-//const char* ssid     = "tulix-mobile";
-const char* ssid     = "tulix-upstairs";
-const char* password = "vivalasalsa07";
-const char * DESTINATION_HOST = "ulno-work";
-//const char * DESTINATION_HOST = "hoadytotes"; // ben's pc
-//const char* DESTINATION_HOST = "192.168.43.1";
-//const char* DESTINATION_HOST = "192.168.15.167"; // asus phone
-//const char* DESTINATION_HOST = "192.168.15.168"; // note 3 phone
-//const char* DESTINATION_HOST = "192.168.15.198"; // fire stick
-//const char* DESTINATION_HOST = "localhost";
-//const char* DESTINATION_HOST = "192.168.15.194";
+const char* ssid     = "iotempire";
+const char* password = "internetofthings";
+const char * DESTINATION_HOST = "192.168.23.175";
 int DESTINATION_PORT = 19877;
 WiFiUDP udp;
 IPAddress serverIP;
