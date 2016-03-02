@@ -32,7 +32,7 @@ Touch_Buttons::Touch_Buttons(int threshold, int debounce, bool internal_pullup, 
 }
 
 Touch_Buttons::Touch_Buttons() {
-  init( 4, 5, true, true);
+  init( 9, 5, true, true);
 }
 
 static void pull_down( int gpio ) {
