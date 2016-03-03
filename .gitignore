@@ -2,6 +2,7 @@
 .clang_complete
 .gcc-flags.json
 .travis.yml
+.pioenvs
 
 # Unix-stuff
 *~
