@@ -25,6 +25,13 @@ void Touch_Buttons::init(int threshold, int debounce, int discharge_delay_ms, bo
   for(int i=0; i < MAX_BUTTONS; i++) {
     debouncer[i] = 0;
   }
+  debug(0,0); // no debugging by default
+}
+
+void Touch_Buttons::debug( int level, int count ) { // debug level: 0=off, 1=info, 2=all; count: <0: never, n: every n calls
+  this->debug_level = level;
+  this->debug_count = count;
+  debug_frame = 0;
 }
 
 Touch_Buttons::Touch_Buttons(int threshold, int debounce, int discharge_delay_ms, bool internal_pullup, bool chargedelay ) {
@@ -77,10 +84,11 @@ void Touch_Buttons::add_button(int id, int gpio_pin) {
   add_button(id,gpio_pin,default_threshold);
 }
 
-void Touch_Buttons::check() {
+bool Touch_Buttons::check() {
   const int DIRECT_READS = 50;  // this is a fixed constant reflecting the 20 single reads in this function
   uint32_t regcache[DIRECT_READS];
   int_fast16_t timer = 0;
+  bool one_pressed = false;
 
 /*    //PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO5_U);
   //GPIO_OUTPUT_SET(gpio, 0); // pull down
@@ -162,17 +170,30 @@ void Touch_Buttons::check() {
         decrease_debouncer(b);
       }
     }
+    if(update_state(b)) one_pressed = true; // if only on epressed change to true
     /* debug */
-    /*Serial.print("Button Id: ");
-    Serial.print(get_button_id(b));
-    Serial.print(" Time: ");
-    Serial.print(timer);
-    Serial.print(" Time2: ");
-    Serial.print(timer2);
-    Serial.print(" Debounce: ");
-    Serial.print(debouncer[b]);
-    Serial.println();*/
+    if(debug_level>=1 && debug_frame >= debug_count) {
+      Serial.print("I");
+      Serial.print(get_button_id(b));
+      Serial.print(" P");
+      Serial.print(gpio);
+      Serial.print(" T");
+      Serial.print(timer);
+      Serial.print(" TT");
+      Serial.print(timer2);
+      Serial.print(" D");
+      Serial.print(debouncer[b]);
+      Serial.print("  ");
+    }
   } // end of loop through all buttons
+  if(debug_level>=1) {
+    if(debug_frame >= debug_count) {
+      debug_frame = 0;
+      Serial.println();
+    }
+    debug_frame ++;
+  }
+  return one_pressed;
 }
 
 int Touch_Buttons::get_button(int id) {

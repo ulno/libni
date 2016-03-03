@@ -37,28 +37,36 @@ private:
     button_array[nr*2+1] = state;
   }
 
-  inline void update_state(int nr) {
-    set_button_state(nr, debouncer[nr]>=debounce_value/2?1:0);
+  inline bool update_state(int nr) {
+    if(debouncer[nr]>=debounce_value/2) {
+      set_button_state(nr, 1);
+      return true;
+    } else {
+      set_button_state(nr, 0);
+      return false;
+    }
   }
 
   inline void increase_debouncer(int nr) {
     if(debouncer[nr] < debounce_value) debouncer[nr] ++;
-    update_state(nr);
   }
 
   inline void decrease_debouncer(int nr) {
     if(debouncer[nr] > 0) debouncer[nr] --;
-    update_state(nr);
   }
 
   void init( int threshold, int debounce, int discharge_delay_ms, bool internal_pullup, bool chargedelay );
 
+  int debug_count;
+  int debug_level;
+  int debug_frame;
 public:
   Touch_Buttons( int threshold, int debounce, int discharge_delay_ms, bool internal_pullup, bool chargedelay);
   Touch_Buttons(); // default init for internal pullups and metal touch sensors
+  void debug( int level, int count ); // debug level: 0=off, 1=info, 2=all; count: <0: never, n: every n calls
   void add_button(int id, int gpio_pin); // add a button for a given gpio_pin and assign id
   void add_button(int id, int gpio_pin, int threshold); // also specify button-specific threshold
-  void check(); // check and update state of all buttons
+  bool check(); // check and update state of all buttons, if one pressed return true, else false
   int get_button(int id); // get state of button with specific id
   /**
    * returns pointer to list with tuples of (int id,int state)

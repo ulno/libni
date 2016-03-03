@@ -29,6 +29,7 @@ void initAllButtons() {
   newButton('s',  5, true ); // down
   newButton('d', 13, true ); // right
   newButton('q',  4, true ); // fire
+  newButton( 27,  2, true ); // menu/escape (touch button on espresso lite)
 }
 
 // other global vars
@@ -64,7 +65,7 @@ void init_header() {
     pos += 1;
   }
   // TODO: check ID construction
-  byte CLIENT_ID[4] = {0,0,0,1};
+  byte CLIENT_ID[4] = {0,0,0,2}; // button id is 2
   for(int i=0; i<4; i++) {
     message[pos] = CLIENT_ID[i];
     pos += 1;
@@ -78,7 +79,7 @@ void initButton( int buttonIndex, unsigned char code, int pin, bool pullup ) {
   buttonLastState[ buttonIndex ] = false;
   //setButtonState(code,false); //done already
   if(pullup) pinMode(pin, INPUT_PULLUP);
-  else pinMode(pin, INPUT); // needs to be manually pulled down  
+  else pinMode(pin, INPUT); // needs to be manually pulled down
 }
 
 void newButton( unsigned char code, int pin, bool pullup ) {
@@ -90,7 +91,7 @@ void newButton( unsigned char code, int pin, bool pullup ) {
   }
 }
 
-   
+
 bool checkButton( int buttonIndex ) {
     if(digitalRead( buttonPin[buttonIndex] ) == (buttonPullup[buttonIndex]?LOW:HIGH)) {
         if(buttonThresCounter[buttonIndex] < BUTTON_THRES)
@@ -113,16 +114,16 @@ void setup() {
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
-  
+
   WiFi.begin(ssid, password);
-  
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
 
   Serial.println("");
-  Serial.println("WiFi connected");  
+  Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
@@ -130,7 +131,7 @@ void setup() {
     message[i]=0; // init
   }
   initAllButtons();
-  
+
   pinMode(STATUS_LED, OUTPUT);
 
   WiFi.hostByName(DESTINATION_HOST, serverIP); // resolve name
@@ -158,7 +159,7 @@ void send() {
 void loop() {
 
   frame ++;
-  
+
   bool anyPressed = false;
   bool changed = false;
   for( int i=0; i<buttonsAllocated; i++ ) {
