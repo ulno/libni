@@ -8,17 +8,17 @@
 #include <Arduino.h>
 #include "Touch_Buttons.h"
 
-void Touch_Buttons::init(int threshold, int debounce, bool internal_pullup, bool chargedelay ) {
+void Touch_Buttons::init(int threshold, int debounce, int discharge_delay_ms, bool internal_pullup, bool chargedelay ) {
   // threshold = 108; // 1/2mOhm resistor + graphite + scotch tape
   // threshold = 400; // > 50000 with 1MOhm
   //threshold = 4;// internal resistor (set to 20 to see speed)
-  this->threshold = threshold;
+  this->default_threshold = threshold;
   this->debounce_value = debounce*2; // reasonable is 5
   this->use_internal_pullup = internal_pullup; // we use it in the simplest version to not have external resistors
   this->measure_chargedelay = chargedelay; // true should be used when using internal pullup
 
   _size = 0;
-  initial_wait = 1;
+  initial_wait = discharge_delay_ms;
   for(int i=0; i < MAX_BUTTONS * 2; i++) {
     button_array[i] = 0;
   }
@@ -27,12 +27,12 @@ void Touch_Buttons::init(int threshold, int debounce, bool internal_pullup, bool
   }
 }
 
-Touch_Buttons::Touch_Buttons(int threshold, int debounce, bool internal_pullup, bool chargedelay ) {
-  init( threshold, debounce, internal_pullup, chargedelay);
+Touch_Buttons::Touch_Buttons(int threshold, int debounce, int discharge_delay_ms, bool internal_pullup, bool chargedelay ) {
+  init( threshold, debounce, discharge_delay_ms, internal_pullup, chargedelay);
 }
 
 Touch_Buttons::Touch_Buttons() {
-  init( 9, 5, true, true);
+  init( 9, 5, 1, true, true);
 }
 
 static void pull_down( int gpio ) {
@@ -59,11 +59,12 @@ void Touch_Buttons::pull_down_all() {
   }
 } too slow */
 
-void Touch_Buttons::add_button(int id, int gpio_pin) {
+void Touch_Buttons::add_button(int id, int gpio_pin, int _threshold) {
   if(_size < MAX_BUTTONS ) {
     set_button_id(_size, id);
     set_button_state(_size, -1);
     button_gpio[_size] = gpio_pin;
+    threshold[_size] = _threshold;
     _size ++;
     // needs to be pulled down by default to be discharged
     pull_down(gpio_pin);
@@ -72,8 +73,12 @@ void Touch_Buttons::add_button(int id, int gpio_pin) {
   }
 }
 
+void Touch_Buttons::add_button(int id, int gpio_pin) {
+  add_button(id,gpio_pin,default_threshold);
+}
+
 void Touch_Buttons::check() {
-  const int DIRECT_READS = 20;  // this is a fixed constant reflecting the 20 single reads in this function
+  const int DIRECT_READS = 50;  // this is a fixed constant reflecting the 20 single reads in this function
   uint32_t regcache[DIRECT_READS];
   int_fast16_t timer = 0;
 
@@ -90,7 +95,7 @@ void Touch_Buttons::check() {
   for(int b=_size-1; b>=0; b--) {
     int gpio = button_gpio[b];
 
-    timer = threshold - DIRECT_READS;
+    timer = threshold[b] - DIRECT_READS;
 
     // (GPIO_REG_READ(GPIO_IN_ADDRESS) = READ_PERI_REG(PERIPHS_GPIO_BASEADDR + GPIO_IN_ADDRESS)
     //volatile uint32_t *gpio_ports = (volatile uint32_t *)(PERIPHS_GPIO_BASEADDR + GPIO_IN_ADDRESS); slower than fixed address
@@ -99,35 +104,29 @@ void Touch_Buttons::check() {
 
     //GPIO_DIS_OUTPUT(gpio);
     //PIN_PULLUP_EN(PERIPHS_IO_MUX_GPIO5_U);
-    // TODO: add if condition
-    pinMode(gpio, INPUT_PULLUP);
+    // TODO: add if condition (change everywhere else)
+    if(use_internal_pullup) pinMode(gpio, INPUT_PULLUP);
+    else pinMode(gpio, INPUT);
 
     // the following is extremely time critical as the recharging is pretty fast
     // read directly to be maximum fast
-    // 5x
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    // 5x
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    // 5x
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    // 5x
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    *(regcache_writer ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
+    // 100x total in fast, then slower
+    #define read_into_cache_x10(dest) \
+    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
+    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
+    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
+    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
+    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
+    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
+    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
+    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
+    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
+    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
+    read_into_cache_x10(regcache_writer);
+    read_into_cache_x10(regcache_writer);
+    read_into_cache_x10(regcache_writer);
+    read_into_cache_x10(regcache_writer);
+    read_into_cache_x10(regcache_writer);
     // read a little slower
     //while (!(gpio_input_get()&(1<<gpio)) && (riseTime < threshold)) { // slow?
     //while (!(gpio_input_get()&32) && (riseTime < threshold)) { // slow?
@@ -138,7 +137,7 @@ void Touch_Buttons::check() {
 
     pull_down(gpio);
 
-    timer = threshold - DIRECT_READS - timer;
+    timer = threshold[b] - DIRECT_READS - timer;
     // adjust by the fast read direct accesses
     int timer2 = 0;
     for(int i=0; i<DIRECT_READS; i++) {
@@ -150,7 +149,7 @@ void Touch_Buttons::check() {
     if( timer2 < DIRECT_READS) timer = timer2;
     else timer += DIRECT_READS;
     button_time[b] = timer; // save time for this button
-    if (timer < threshold) {
+    if (timer < threshold[b]) {
       if(measure_chargedelay) { // in this case being under the time means, no human touched the wire -> it is untouched
         decrease_debouncer(b);
       } else {

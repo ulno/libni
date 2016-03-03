@@ -17,7 +17,8 @@ private:
   int button_gpio[MAX_BUTTONS];
   long button_time[MAX_BUTTONS]; // used for measuring, how long the charging took
   int debouncer[MAX_BUTTONS]; // used for debouncing
-  long threshold;
+  long threshold[MAX_BUTTONS];
+  int default_threshold;
   int debounce_value;
   int initial_wait; // wait after pulling down before measuring in ms
   bool use_internal_pullup;
@@ -50,12 +51,13 @@ private:
     update_state(nr);
   }
 
-  void init( int threshold, int debounce, bool internal_pullup, bool chargedelay );
+  void init( int threshold, int debounce, int discharge_delay_ms, bool internal_pullup, bool chargedelay );
 
 public:
-  Touch_Buttons( int threshold, int debounce, bool internal_pullup, bool chargedelay);
+  Touch_Buttons( int threshold, int debounce, int discharge_delay_ms, bool internal_pullup, bool chargedelay);
   Touch_Buttons(); // default init for internal pullups and metal touch sensors
   void add_button(int id, int gpio_pin); // add a button for a given gpio_pin and assign id
+  void add_button(int id, int gpio_pin, int threshold); // also specify button-specific threshold
   void check(); // check and update state of all buttons
   int get_button(int id); // get state of button with specific id
   /**

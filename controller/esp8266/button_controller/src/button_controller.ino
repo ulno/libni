@@ -2,18 +2,10 @@
 #include <lwip/ip.h> // for endian conversion htons, htonl, ...
 #include <WiFiUdp.h>
 
-//const char* ssid     = "tulix-mobile";
-const char* ssid     = "tulix-upstairs";
-const char* password = "vivalasalsa07";
+const char* ssid     = "iotempire";
+const char* password = "internetofthings";
 
-const char * DESTINATION_HOST = "ulno-work";
-//const char * DESTINATION_HOST = "hoadytotes"; // ben's pc
-//const char* DESTINATION_HOST = "192.168.43.1";
-//const char* DESTINATION_HOST = "192.168.15.167"; // asus phone
-//const char* DESTINATION_HOST = "192.168.15.168"; // note 3 phone
-//const char* DESTINATION_HOST = "192.168.15.198"; // fire stick
-//const char* DESTINATION_HOST = "localhost";
-//const char* DESTINATION_HOST = "192.168.15.194";
+const char * DESTINATION_HOST = "192.168.23.175";
 int DESTINATION_PORT = 19877;
 
 const char *MAGIC = "LBNI"; // magic identifier for Game Network Controller
@@ -32,12 +24,11 @@ const int STATUS_LED = 16;
 
 void newButton( unsigned char code, int pin, bool pullup );
 void initAllButtons() {
-  newButton( 16, 15, false ); // up
-  newButton(  2, 12, true ); // left
-  newButton( 14,  5, true ); // down
-  newButton(  6, 13, true ); // right
-  newButton( ' ',  4, true ); // fire
-  newButton( 'm',  2, true ); // menu
+  newButton('w', 15, false ); // up
+  newButton('a', 12, true ); // left
+  newButton('s',  5, true ); // down
+  newButton('d', 13, true ); // right
+  newButton('q',  4, true ); // fire
 }
 
 // other global vars
