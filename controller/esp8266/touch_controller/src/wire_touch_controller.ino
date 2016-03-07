@@ -32,12 +32,12 @@ void send() {
 void setup() {
   ulno_esp_init("Wire touch controller started.",ssid,password);
   libni_sender = new Libni_Sender(MY_ID,DESTINATION_HOST);
-  tb = new Touch_Buttons(8, 3, 1, true, true); // better for aluminum
+  tb = new Touch_Buttons(8, 3, 1, true, true); // better for aluminum than the defaults
   pinMode(STATUS_LED, OUTPUT);
   digitalWrite(STATUS_LED, LOW);
 
   initAllButtons();
-  tb->debug(2,200);
+  tb->debug(2,50); // approx every 50x10 (delay) a debug message from teh buttons (every 50th call)
 }
 
 long frames = 0;
