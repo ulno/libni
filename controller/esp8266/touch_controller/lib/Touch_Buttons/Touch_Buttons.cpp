@@ -91,7 +91,7 @@ void Touch_Buttons::add_button(int id, int gpio_pin) {
 bool Touch_Buttons::check() {
   const int MAX_DIRECT_READS = 100;  // this is a fixed constant reflecting the up to 100 single reads in this function
   uint32_t regcache[MAX_DIRECT_READS];
-  int_fast16_t timer = 0;
+  int_fast16_t threshold_left;
   bool one_pressed = false;
 
 /*    //PIN_PULLUP_DIS(PERIPHS_IO_MUX_GPIO5_U);
@@ -115,25 +115,26 @@ bool Touch_Buttons::check() {
     //GPIO_DIS_OUTPUT(gpio);
     //PIN_PULLUP_EN(PERIPHS_IO_MUX_GPIO5_U);
     int pullup_mode =  use_internal_pullup?INPUT_PULLUP:INPUT;
-    int_fast16_t threshold_left = threshold[b];
-    int_fast16_t threshold_10steps = threshold_left / 10;
+    threshold_left = threshold[b];
+    int_fast16_t threshold_10steps = (threshold_left - 1)/ 10;
     if(threshold_10steps>9) threshold_10steps = 9;
-    threshold_10steps ++;
+    else if(threshold_10steps<0) threshold_10steps = 0;
+    threshold_10steps ++; // so 0-10: 1 | 11-20: 2 | 21-30: 3 | ... 91-100: 10
     uint16_t direct_reads = threshold_10steps * 10;
     threshold_left -= direct_reads;
     // the following is extremely time critical as the recharging is pretty fast
     // read directly to be maximum fast
     switch(threshold_10steps) {
-      case 1:
+      case 1: // 0-10 -> 10 steps
         pinMode(gpio, pullup_mode);
         ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
         break;
-      case 2:
+      case 2: // 11-20 -> 20 steps
         pinMode(gpio, pullup_mode);
         ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
         ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
         break;
-      case 3:
+      case 3: // 21-30 -> 30 steps
         pinMode(gpio, pullup_mode);
         ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
         ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
@@ -194,10 +195,10 @@ bool Touch_Buttons::check() {
       }
       timer2++;
     }
-    if( timer2 < direct_reads) timer = timer2;
-    else timer += direct_reads;
-    button_time[b] = timer; // save time for this button
-    if (timer < threshold[b]) {
+    if( timer2 < direct_reads) threshold_left = timer2;
+    else threshold_left += direct_reads;
+    button_time[b] = threshold_left; // save time for this button
+    if (threshold_left < threshold[b]) {
       if(measure_chargedelay) { // in this case being under the time means, no human touched the wire -> it is untouched
         decrease_debouncer(b);
       } else {
@@ -218,7 +219,7 @@ bool Touch_Buttons::check() {
       Serial.print(" P");
       Serial.print(gpio);
       Serial.print(" T");
-      Serial.print(timer);
+      Serial.print(threshold_left);
       Serial.print(" TT");
       Serial.print(timer2);
       Serial.print(" D");
