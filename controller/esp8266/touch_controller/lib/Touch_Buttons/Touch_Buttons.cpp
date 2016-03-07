@@ -8,6 +8,10 @@
 #include <Arduino.h>
 #include "Touch_Buttons.h"
 
+#define ulno_do_2x(exp) {exp;exp;}
+#define ulno_do_5x(exp) {exp;exp;exp;exp;exp;}
+#define ulno_do_10x(exp) {ulno_do_2x(ulno_do_5x(exp))}
+
 void Touch_Buttons::init(int threshold, int debounce, int discharge_delay_ms, bool internal_pullup, bool chargedelay ) {
   // threshold = 108; // 1/2mOhm resistor + graphite + scotch tape
   // threshold = 400; // > 50000 with 1MOhm
@@ -85,8 +89,8 @@ void Touch_Buttons::add_button(int id, int gpio_pin) {
 }
 
 bool Touch_Buttons::check() {
-  const int DIRECT_READS = 50;  // this is a fixed constant reflecting the 20 single reads in this function
-  uint32_t regcache[DIRECT_READS];
+  const int MAX_DIRECT_READS = 100;  // this is a fixed constant reflecting the up to 100 single reads in this function
+  uint32_t regcache[MAX_DIRECT_READS];
   int_fast16_t timer = 0;
   bool one_pressed = false;
 
@@ -103,8 +107,6 @@ bool Touch_Buttons::check() {
   for(int b=_size-1; b>=0; b--) {
     int gpio = button_gpio[b];
 
-    timer = threshold[b] - DIRECT_READS;
-
     // (GPIO_REG_READ(GPIO_IN_ADDRESS) = READ_PERI_REG(PERIPHS_GPIO_BASEADDR + GPIO_IN_ADDRESS)
     //volatile uint32_t *gpio_ports = (volatile uint32_t *)(PERIPHS_GPIO_BASEADDR + GPIO_IN_ADDRESS); slower than fixed address
     uint32_t bitmask = 1 << gpio;
@@ -112,50 +114,88 @@ bool Touch_Buttons::check() {
 
     //GPIO_DIS_OUTPUT(gpio);
     //PIN_PULLUP_EN(PERIPHS_IO_MUX_GPIO5_U);
-    // TODO: add if condition (change everywhere else)
-    if(use_internal_pullup) pinMode(gpio, INPUT_PULLUP);
-    else pinMode(gpio, INPUT);
-
+    int pullup_mode =  use_internal_pullup?INPUT_PULLUP:INPUT;
+    int_fast16_t threshold_left = threshold[b];
+    int_fast16_t threshold_10steps = threshold_left / 10;
+    if(threshold_10steps>9) threshold_10steps = 9;
+    threshold_10steps ++;
+    uint16_t direct_reads = threshold_10steps * 10;
+    threshold_left -= direct_reads;
     // the following is extremely time critical as the recharging is pretty fast
     // read directly to be maximum fast
-    // 100x total in fast, then slower
-    #define read_into_cache_x10(dest) \
-    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
-    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
-    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
-    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
-    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
-    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
-    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
-    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
-    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS); \
-    *((dest) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS);
-    read_into_cache_x10(regcache_writer);
-    read_into_cache_x10(regcache_writer);
-    read_into_cache_x10(regcache_writer);
-    read_into_cache_x10(regcache_writer);
-    read_into_cache_x10(regcache_writer);
-    // read a little slower
+    switch(threshold_10steps) {
+      case 1:
+        pinMode(gpio, pullup_mode);
+        ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
+        break;
+      case 2:
+        pinMode(gpio, pullup_mode);
+        ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
+        ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
+        break;
+      case 3:
+        pinMode(gpio, pullup_mode);
+        ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
+        ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
+        ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
+        break;
+      case 4:
+        pinMode(gpio, pullup_mode);
+        ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
+        ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
+        ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
+        ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
+        break;
+      case 5:
+        pinMode(gpio, pullup_mode);
+        ulno_do_5x(ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS)));
+        break;
+      case 6:
+        pinMode(gpio, pullup_mode);
+        ulno_do_5x(ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS)));
+        ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
+        break;
+      case 7:
+        pinMode(gpio, pullup_mode);
+        ulno_do_5x(ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS)));
+        ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
+        ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
+        break;
+      case 8:
+        pinMode(gpio, pullup_mode);
+        ulno_do_2x(ulno_do_2x(ulno_do_2x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS))));
+        break;
+      case 9:
+        pinMode(gpio, pullup_mode);
+        ulno_do_2x(ulno_do_2x(ulno_do_2x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS))));
+        ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS));
+        break;
+      case 10:
+        pinMode(gpio, pullup_mode);
+        ulno_do_10x(ulno_do_10x(*((regcache_writer) ++) = GPIO_REG_READ(GPIO_IN_ADDRESS)));
+        break;
+    }
+    // read the potential rest a little slower
     //while (!(gpio_input_get()&(1<<gpio)) && (riseTime < threshold)) { // slow?
     //while (!(gpio_input_get()&32) && (riseTime < threshold)) { // slow?
     //while (!(*gpio_ports&32) && (timer > 0)) { // slower than fixed address
-    while ((timer > 0) && !(GPIO_REG_READ(GPIO_IN_ADDRESS)&bitmask)) {
-        --timer;
+    while ((threshold_left > 0) && !(GPIO_REG_READ(GPIO_IN_ADDRESS)&bitmask)) {
+        --threshold_left;
     }
 
-    pull_down(gpio);
+    pull_down(gpio); // needs to be pulled down as early as possible to not acumulate too much charge
 
-    timer = threshold[b] - DIRECT_READS - timer;
+    threshold_left = threshold[b] - (threshold_10steps*10) - threshold_left;
     // adjust by the fast read direct accesses
     int timer2 = 0;
-    for(int i=0; i<DIRECT_READS; i++) {
+    for(int i=0; i<direct_reads; i++) {
       if(regcache[i]&bitmask) {
         break;
       }
       timer2++;
     }
-    if( timer2 < DIRECT_READS) timer = timer2;
-    else timer += DIRECT_READS;
+    if( timer2 < direct_reads) timer = timer2;
+    else timer += direct_reads;
     button_time[b] = timer; // save time for this button
     if (timer < threshold[b]) {
       if(measure_chargedelay) { // in this case being under the time means, no human touched the wire -> it is untouched

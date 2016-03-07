@@ -12,6 +12,13 @@
  * This class handles several touch-buttons
  */
 class Touch_Buttons {
+public:
+  static const int FIRE=' ';
+  static const int DOWN=14;
+  static const int LEFT=2;
+  static const int RIGHT=6;
+  static const int UP=16;
+  static const int ESCAPE=27;
 private:
   int button_array[MAX_BUTTONS*2]; // Tuples of (id,state)
   int button_gpio[MAX_BUTTONS];
@@ -85,4 +92,4 @@ public:
   // TODO: add calibration settings
 };
 
-#endif
+#endif // _TOUCH_BUTTONS_H
