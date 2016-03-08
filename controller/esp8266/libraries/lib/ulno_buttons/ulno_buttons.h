@@ -1,17 +1,17 @@
-// Header file for Libni_Buttons
+// Header file for Ulno_Buttons
 //
 // author: ulno
 // created: 2016-03-01
 
-#ifndef _LIBNI_BUTTONS_H
-#define _LIBNI_BUTTONS_H
+#ifndef _Ulno_BUTTONS_H
+#define _Ulno_BUTTONS_H
 
 #define MAX_BUTTONS 32
 
 /**
-  * helper class for Libni=Buttons (representing one instance of a button)
+  * helper class for ulno_Buttons (representing one instance of a button)
   */
-class Libni_Button {
+class Ulno_Button {
 public:
   static const int GENERIC = 0;
   static const int TOUCH = 1;
@@ -23,6 +23,7 @@ protected:
   bool state;
   int debounce_max;
   int debouncer;
+  bool use_pullup;
 
   inline bool update_state() {
     if(debouncer>=debounce_max/2) {
@@ -44,7 +45,7 @@ protected:
   void debug_base(int debug_level);
 
 public:
-  Libni_Button(int id, int gpio, int debounce);
+  Ulno_Button(int id, int gpio, int debounce, bool pullup);
   inline int get_id() {return id;}
   inline bool get_state() {return state;}
   inline int get_type() {return type;}
@@ -55,7 +56,7 @@ public:
 /**
  * This class handles several touch or push buttons
  */
-class Libni_Buttons {
+class Ulno_Buttons {
 public:
   static const int FIRE=' ';
   static const int DOWN=14;
@@ -64,7 +65,7 @@ public:
   static const int UP=16;
   static const int ESCAPE=27;
 private:
-  Libni_Button * button_array[MAX_BUTTONS];
+  Ulno_Button * button_array[MAX_BUTTONS];
   int default_threshold;
   int default_debounce_max;
   int default_discharge_delay_ms; // wait after pulling down before measuring in ms
@@ -76,18 +77,21 @@ private:
   void set_input_all();*/
 
 
-  void init( int threshold, int debounce, int discharge_delay_ms, bool internal_pullup, bool chargedelay );
+  void init( int debounce, int threshold, int discharge_delay_ms, bool internal_pullup, bool chargedelay );
 
   int debug_count;
   int debug_level;
   int debug_frame;
 public:
-  Libni_Buttons( int threshold, int debounce, int discharge_delay_ms, bool internal_pullup, bool chargedelay);
-  Libni_Buttons(); // default init for internal pullups and metal touch sensors
+  // add info for touchbuttons
+  Ulno_Buttons( int debounce, int threshold,  int discharge_delay_ms, bool internal_pullup, bool chargedelay);
+  Ulno_Buttons(); // default init for internal pullups and metal touch sensors
   void debug( int level, int count ); // debug level: 0=off, 1=info, 2=all; count: <0: never, n: every n calls
   void add_push_button(int id, int gpio_pin); // add a push button for a given gpio_pin and assign id
+  void add_push_button(int id, int gpio_pin, bool internal_pullup); // add a push button for a given gpio_pin and assign id
   void add_touch_button(int id, int gpio_pin); // add a button for a given gpio_pin and assign id
   void add_touch_button(int id, int gpio_pin, int threshold); // also specify button-specific threshold
+  void add_touch_button(int id, int gpio_pin, bool internal_pullup, int threshold); // also specify pull-up-use
   bool check(); // check and update state of all buttons, if one pressed return true, else false
   int get_button(int id); // get state of button with specific id
 
@@ -104,4 +108,4 @@ public:
   // TODO: add calibration settings
 };
 
-#endif // _LIBNI_BUTTONS_H
+#endif // _Ulno_BUTTONS_H

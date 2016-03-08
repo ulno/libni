@@ -13,12 +13,13 @@ Ulno_Buttons *tb;
 Libni_Sender *libni_sender;
 
 void initAllButtons() {
-  tb->add_push_button('q',  4); // fire
-  tb->add_push_button('s',  5); // down
-  tb->add_push_button('a', 12); // left
-  tb->add_push_button('d', 13); // right
-  tb->add_push_button('w', 14); // up
-  tb->add_push_button(Ulno_Buttons::ESCAPE,15,false); // up 15 is pulled down all the time as it seems -> does not work easily
+  tb->add_push_button(Ulno_Buttons::FIRE,  4); // fire
+  //tb->add_touch_button(Ulno_Buttons::FIRE,  4); // fire
+  tb->add_touch_button(Ulno_Buttons::DOWN,  5); // down
+  tb->add_touch_button(Ulno_Buttons::LEFT, 12); // left
+  tb->add_touch_button(Ulno_Buttons::RIGHT,13); // right
+  tb->add_touch_button(Ulno_Buttons::UP,   14); // up
+  //tb->add_touch_button(16,15); // up 15 is pulled down all the time as it seems -> does not work easily
 }
 
 void send() {
@@ -32,7 +33,7 @@ void send() {
 void setup() {
   ulno_esp_init("Wire touch controller started.",ssid,password);
   libni_sender = new Libni_Sender(MY_ID,DESTINATION_HOST);
-  tb = new Ulno_Buttons(); // defaults are fine for normal buttons
+  tb = new Ulno_Buttons(3, 8, 4, true, true); // better for aluminum than the defaults
   pinMode(STATUS_LED, OUTPUT);
   digitalWrite(STATUS_LED, LOW);
 
