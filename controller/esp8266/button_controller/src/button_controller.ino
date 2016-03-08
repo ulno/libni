@@ -1,22 +1,11 @@
-#include <ESP8266WiFi.h>
-#include <lwip/ip.h> // for endian conversion htons, htonl, ...
-#include <WiFiUdp.h>
+#include "ulno_esp_utils.h"
+#include "libni.h"
 
 const char* ssid     = "iotempire";
 const char* password = "internetofthings";
-
 const char * DESTINATION_HOST = "192.168.23.175";
-int DESTINATION_PORT = 19877;
+const int MY_ID = 2;
 
-const char *MAGIC = "LBNI"; // magic identifier for Game Network Controller
-const int PROTOCOL_VERSION = 1;
-const int NUMBER_OF_BUTTONS = 256;
-const int NUMBER_OF_BUTTON_BYTES = (NUMBER_OF_BUTTONS + 7)/8;
-const int NUMBER_OF_AXIS = 16;
-const int NUMBER_OF_AXIS_BYTES = NUMBER_OF_AXIS * 2;
-const int MAX_BUFFER_SIZE = 128;
-const int BUFFER_HEADER_SIZE = 16;
-byte message[MAX_BUFFER_SIZE];
 const int MAX_NUMBER_OF_BUTTONS = 16;
 const int BUTTON_THRES = 16; // how many times has an on be counted to assume this button is on
 //const int STATUS_LED = 2;
@@ -40,37 +29,7 @@ bool buttonLastState[MAX_NUMBER_OF_BUTTONS];
 unsigned int buttonThresCounter[MAX_NUMBER_OF_BUTTONS];
 int buttonsAllocated=0;
 int frame = 0;
-WiFiUDP udp;
-IPAddress serverIP;
-
-
-void init_header() {
-  int pos = 0;
-  for(int i=0; i<4; i++) {
-    message[pos] = MAGIC[i];
-    pos += 1;
-  }
-  long version = htonl(PROTOCOL_VERSION);
-  for(int i=0; i<4; i++) {
-    message[pos] = ((char *)&version)[i];
-    pos += 1;
-  }
-  int protocol_type = htons(1); //TODO: read or define 1 elsewhere
-  for(int i=0; i<2; i++) {
-    message[pos] = ((char *)&protocol_type)[i];
-    pos += 1;
-  }
-  for(int i=0; i<4; i++) {
-    message[pos] = random(256);
-    pos += 1;
-  }
-  // TODO: check ID construction
-  byte CLIENT_ID[4] = {0,0,0,2}; // button id is 2
-  for(int i=0; i<4; i++) {
-    message[pos] = CLIENT_ID[i];
-    pos += 1;
-  }
-}
+Libni_Sender *libni_sender;
 
 void initButton( int buttonIndex, unsigned char code, int pin, bool pullup ) {
   buttonCode[ buttonIndex ] = code;
@@ -91,7 +50,6 @@ void newButton( unsigned char code, int pin, bool pullup ) {
   }
 }
 
-
 bool checkButton( int buttonIndex ) {
     if(digitalRead( buttonPin[buttonIndex] ) == (buttonPullup[buttonIndex]?LOW:HIGH)) {
         if(buttonThresCounter[buttonIndex] < BUTTON_THRES)
@@ -104,56 +62,20 @@ bool checkButton( int buttonIndex ) {
 }
 
 void setup() {
-
-  Serial.begin(115200);
-  delay(10);
-
-  // We start by connecting to a WiFi network
-
-  Serial.println();
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-
-  for(int i=0; i<sizeof(message); i++) {
-    message[i]=0; // init
-  }
-  initAllButtons();
+  ulno_esp_init("Push-button controller started.",ssid,password);
+  libni_sender = new Libni_Sender(MY_ID,DESTINATION_HOST);
 
   pinMode(STATUS_LED, OUTPUT);
 
-  WiFi.hostByName(DESTINATION_HOST, serverIP); // resolve name
-
-  // init header
-  init_header();
+  initAllButtons();
 }
 
 void send() {
-  // Serial.println("sending UDP packet...");
-  // build package
-  byte *msg = message + BUFFER_HEADER_SIZE;
+  libni_sender->message_new();
   for( int i=0; i<buttonsAllocated; i++ ) {
-    *msg = buttonLastState[i]?2:1;
-    msg ++;
-    *msg = buttonCode[i];
-    msg ++;
-  }   // TODO eventually check overflow
-
-  udp.beginPacket(serverIP, DESTINATION_PORT);
-  udp.write(message, BUFFER_HEADER_SIZE + buttonsAllocated*2);
-  udp.endPacket();
+    libni_sender->message_add_button( buttonCode[i], buttonLastState[i] );
+  }
+  libni_sender->message_send();
 }
 
 void loop() {
@@ -186,5 +108,5 @@ void loop() {
     //Serial.println("LOW");
   }
 
-  delay(1); // or yield();
+  delay(5); // or yield();
 }
