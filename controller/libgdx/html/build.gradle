@@ -7,8 +7,8 @@ gwt {
     minHeapSize="1G"
 
     src = files(file("src/")) // Needs to be in front of "modules" below.
-    modules 'net.ulno.gamenetcontroller.GdxDefinition'
-    devModules 'net.ulno.gamenetcontroller.GdxDefinitionSuperdev'
+    modules 'net.ulno.libni.controller.gdx.GdxDefinition'
+    devModules 'net.ulno.libni.controller.gdx.GdxDefinitionSuperdev'
     project.webAppDirName = 'webapp'
 
     compiler {

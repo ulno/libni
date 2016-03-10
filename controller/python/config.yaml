@@ -1,4 +1,4 @@
-# Network Game Controller (NeGaCo) Client description
+# libni Client description
 id: 0x00000001 # 4 byte client id
 protocol: 1 # protocol version 0: bit block, 1: list of events
 # udp,tcp, or mqtt, format: type://host:port/mqtt-topic (omit topic for udp and tcp)

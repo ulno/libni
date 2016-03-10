@@ -8,7 +8,7 @@ const int Libni_Sender::NUMBER_OF_BUTTON_BYTES = (Libni_Sender::NUMBER_OF_BUTTON
 const int Libni_Sender::NUMBER_OF_AXIS = 16;
 const int Libni_Sender::NUMBER_OF_AXIS_BYTES = Libni_Sender::NUMBER_OF_AXIS * 2;
 const int Libni_Sender::MAX_BUFFER_SIZE = 128;
-const int Libni_Sender::BUFFER_HEADER_SIZE = 16;
+const int Libni_Sender::BUFFER_HEADER_SIZE = 18;
 const int Libni_Sender::DEFAULT_PORT = 19887;
 const char *Libni_Sender::MAGIC = "LBNI";
 
@@ -23,7 +23,7 @@ void Libni_Sender::init_header() {
     message[pos] = ((char *)&version)[i];
     pos += 1;
   }
-  int protocol_type = htons(1); //TODO: read or define 1 elsewhere
+  int protocol_type = htons(1); //TODO: read or define 1 elsewhere - 1 means event based protocol
   for(int i=0; i<2; i++) {
     message[pos] = ((char *)&protocol_type)[i];
     pos += 1;

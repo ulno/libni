@@ -1,6 +1,6 @@
 package net.ulno.nii;
 
-import net.ulno.libni.receiver.LibniControllerListener;
+import net.ulno.libni.receiver.LibniReceiverListener;
 import net.ulno.libni.receiver.LibniMapping;
 import net.ulno.libni.receiver.NetworkMultiplexer;
 
@@ -13,7 +13,7 @@ import java.io.InputStreamReader;
 /**
  * Created by ulno on 24.02.16.
  */
-public class LibniHandler implements LibniControllerListener {
+public class LibniHandler implements LibniReceiverListener {
     Robot robot = null;
     InputStreamReader reader = null;
     NetworkMultiplexer networkMultiplexer = null;
@@ -83,7 +83,7 @@ public class LibniHandler implements LibniControllerListener {
     public void run() {
         while(true) {
             networkMultiplexer.evaluate();
-            robot.delay(10); // prevent busy waiting
+            robot.delay(1); // prevent busy waiting
         }
     }
 

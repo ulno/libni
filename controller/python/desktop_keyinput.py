@@ -110,17 +110,21 @@ pos = 0
 for c in MAGIC:
     message[pos] = c
     pos += 1
+# pos = 4
 version = struct.pack(">H",PROTOCOL_VERSION)
 for c in version:
     message[pos] = c
     pos += 1
+# pos = 8
 protocol_type = struct.pack(">H",config["protocol"])
 for c in protocol_type:
     message[pos] = c
     pos += 1
+# pos = 10
 for c in range(4):
     message[pos] = random.randrange(256)
     pos += 1
+# pos = 4
 if not isinstance(CLIENT_ID, str):
     CLIENT_ID = struct.pack(">L",CLIENT_ID)
 else:

@@ -1,6 +1,6 @@
 android {
     buildToolsVersion "23.0.2"
-    compileSdkVersion 23
+    compileSdkVersion 21
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -15,9 +15,9 @@ android {
         instrumentTest.setRoot('tests')
     }
     defaultConfig {
-        applicationId "net.ulno.gamenetcontroller"
+        applicationId "net.ulno.libni.controller.gdx"
         minSdkVersion 8
-        targetSdkVersion 23
+        targetSdkVersion 21
     }
 }
 
@@ -68,7 +68,7 @@ task run(type: Exec) {
     }
 
     def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'net.ulno.gamenetcontroller/AndroidLauncher'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'net.ulno.libni.controller.gdx/net.ulno.libni.controller.gdx.AndroidLauncher'
 }
 
 // sets up the Android Eclipse project, using the old Ant based build.
@@ -82,8 +82,8 @@ eclipse {
     }
 
     jdt {
-        sourceCompatibility = 1.6
-        targetCompatibility = 1.6
+        sourceCompatibility = 1.7
+        targetCompatibility = 1.7
     }
 
     classpath {
