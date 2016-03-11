@@ -2,6 +2,7 @@ buildscript {
     repositories {
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://repo.eclipse.org/content/repositories/paho-releases/" } // for mqtt
         jcenter()
     }
     dependencies {
@@ -112,6 +113,8 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
+        compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2" // for mqtt
+        //compile "org.yaml:snakeyaml:1.17" // snakeyaml in sonatype
     }
 }
 

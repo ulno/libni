@@ -74,7 +74,7 @@ public class NetworkReceiver extends LibniReceiver {
                                 pointer++;
                                 byte high = messageSaved[pointer];
                                 pointer++;
-                                byte low = messageSaved[pointer];
+                                int low = ((int)messageSaved[pointer]) & 0xff;
                                 int newState = ((high >= 128) ? (256 - high) : high) * 256 + low; // little endian two -complement
                                 if (newState != analogStates[button]) {
                                     analogStates[button] = newState;
