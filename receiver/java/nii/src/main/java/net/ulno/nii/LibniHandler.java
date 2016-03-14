@@ -73,7 +73,7 @@ public class LibniHandler implements LibniReceiverListener {
                 .addButton('y', KeyEvent.VK_Y)
                 .addButton('z', KeyEvent.VK_Z);
 
-        System.out.println("Network Input Injector starting.");
+        System.out.println("Network Input Injector starting injecting.");
         try {
             robot = new Robot();
         } catch (AWTException e) {

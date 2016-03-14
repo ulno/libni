@@ -16,7 +16,7 @@
 #
 
 type: mqtt
-host: 192.168.23.175
+host: ulno-work
 topic: iotempire/libni
 
 #type: udp

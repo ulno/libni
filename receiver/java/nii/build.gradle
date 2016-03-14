@@ -4,6 +4,10 @@ version '1.0-SNAPSHOT'
 apply plugin: 'java'
 
 sourceCompatibility = 1.7
+sourceSets.main.java.srcDirs = [ "src/main/java" ]
+
+project.ext.mainClassName = "net.ulno.nii.Main"
+project.ext.assetsDir = new File(".");
 
 repositories {
     mavenCentral()
@@ -16,4 +20,14 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile "org.yaml:snakeyaml:1.17" // snakeyaml in sonatype
     compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2" // for mqtt
+}
+
+
+task run(dependsOn: classes, type: JavaExec) {
+    main = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    standardOutput = System.out
+    workingDir = project.assetsDir
+    ignoreExitValue = true
 }

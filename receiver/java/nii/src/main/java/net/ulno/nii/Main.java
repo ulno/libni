@@ -10,6 +10,7 @@ import java.io.*;
 public class Main {
 
     public static void main(String [] args) {
+        System.out.println("Network input injector started.");
         LibniHandler lh = new LibniHandler();
         lh.run();
     }
