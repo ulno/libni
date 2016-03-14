@@ -14,6 +14,8 @@ public class LibniMapping {
     public static final int BUTTON_ESCAPE = 27; // SPACE
     public static final int BUTTON_FIRE = 32; // SPACE
     public static final int BUTTON_SPACE = 32; // SPACE
+    public static final int BUTTON_RETURN = 13; // Return/Enter
+    public static final int BUTTON_ENTER = 13; // Return/Enter
 
     HashMap<Integer,ArrayList<Integer>> keycodeToLibniButtons = new HashMap<>();
     HashMap<Integer,ArrayList<Integer>> libniButtonToKeycodes = new HashMap<>();

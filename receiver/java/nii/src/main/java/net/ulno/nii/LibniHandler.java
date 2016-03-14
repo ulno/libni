@@ -36,6 +36,7 @@ public class LibniHandler implements LibniReceiverListener {
                 .addButton(LibniMapping.BUTTON_RIGHT, KeyEvent.VK_RIGHT)
                 .addButton(LibniMapping.BUTTON_FIRE, KeyEvent.VK_SPACE)
                 .addButton(LibniMapping.BUTTON_ESCAPE, KeyEvent.VK_ESCAPE)
+                .addButton(LibniMapping.BUTTON_RETURN, KeyEvent.VK_ENTER)
                 .addButton('0', KeyEvent.VK_0)
                 .addButton('1', KeyEvent.VK_1)
                 .addButton('2', KeyEvent.VK_2)

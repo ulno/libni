@@ -8,4 +8,4 @@ protocol: 1 # protocol version 0: bit block, 1: list of events
 #destination: udp://192.168.43.1:19877
 #destination: udp://localhost:19877
 #destination: udp://192.168.15.194:19877
-destination: mqtt://192.168.15.125/iotempire/libni
+destination: mqtt://localhost/iotempire/libni
