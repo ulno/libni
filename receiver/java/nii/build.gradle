@@ -9,9 +9,11 @@ repositories {
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+    maven { url "https://repo.eclipse.org/content/repositories/paho-releases/" } // for mqtt
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile "org.yaml:snakeyaml:1.17" // snakeyaml in sonatype
+    compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2" // for mqtt
 }

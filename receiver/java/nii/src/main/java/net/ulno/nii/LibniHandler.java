@@ -3,6 +3,7 @@ package net.ulno.nii;
 import net.ulno.libni.receiver.LibniReceiverListener;
 import net.ulno.libni.receiver.LibniMapping;
 import net.ulno.libni.receiver.NetworkMultiplexer;
+import org.yaml.snakeyaml.Yaml;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;

@@ -31,7 +31,7 @@ public class NetworkReceiver extends LibniReceiver {
             pointer += NetworkMultiplexer.BUFFER_HEADER_SIZE;
             // parse header
             // look at protocol type
-            switch (((messageSaved[8] & 255) << 8) + messageSaved[9]) {
+            switch (((messageSaved[6] & 255) << 8) + messageSaved[7]) {
                 case 0: // bitblock
                     int buttonNr = 0;
                     while(buttonNr < NUMBER_OF_BUTTONS) {
@@ -90,7 +90,7 @@ public class NetworkReceiver extends LibniReceiver {
     private void buttonEvent(int buttonNr, boolean newState) {
         boolean oldState = buttonStates[buttonNr];
         if (oldState != newState) {
-              buttonStates[buttonNr] = newState;
+            buttonStates[buttonNr] = newState;
             registerButtonEvent(buttonNr);
         }
     }

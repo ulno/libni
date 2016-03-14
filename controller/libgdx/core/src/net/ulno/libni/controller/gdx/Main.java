@@ -30,7 +30,7 @@ public class Main extends ApplicationAdapter {
 	public static final int NUMBER_OF_BUTTON_BYTES = (NUMBER_OF_BUTTONS + 7)/8;
 	public static final int NUMBER_OF_AXIS = 16;
 	public static final int NUMBER_OF_AXIS_BYTES = NUMBER_OF_AXIS * 2;
-    public static final int HEADER_LENGTH = 18;
+    public static final int HEADER_LENGTH = 16;
     private byte message[] = new byte[HEADER_LENGTH + NUMBER_OF_BUTTON_BYTES + NUMBER_OF_AXIS_BYTES];
     final static byte MAGIC[] = {'L','B','N','I'};
 
@@ -48,7 +48,9 @@ public class Main extends ApplicationAdapter {
     public static final int BUTTON_FIRE = 32; // SPACE
     public static final int BUTTON_SPACE = 32; // SPACE
 
-	private DatagramSocket socket=null;
+    final static float TOUCHPAD_THRESHOLD = 0.5f;
+
+    private DatagramSocket socket=null;
 	DatagramPacket datagramPacket;
 	private long frames=0;
     private Table rootTable;
@@ -175,8 +177,6 @@ public class Main extends ApplicationAdapter {
             pos += 1;
         }
         message[pos++] = 0; // Protocol version = 1
-        message[pos++] = 0;
-        message[pos++] = 0;
         message[pos++] = 1;
 
         message[pos++] = 0;
@@ -318,11 +318,11 @@ public class Main extends ApplicationAdapter {
                 float knobPercentX = tp.getKnobPercentX();
                 float knobPercentY = tp.getKnobPercentY();
                 int directions = 0;
-                if(knobPercentX > 0.2) {
+                if(knobPercentX > TOUCHPAD_THRESHOLD) {
                     setButtonState(BUTTON_RIGHT, true);
                     setButtonState(BUTTON_LEFT, false);
                 }
-                else if(knobPercentX < -0.2) {
+                else if(knobPercentX < -TOUCHPAD_THRESHOLD) {
                     setButtonState(BUTTON_RIGHT, false);
                     setButtonState(BUTTON_LEFT, true);
                 }
@@ -330,11 +330,11 @@ public class Main extends ApplicationAdapter {
                     setButtonState(BUTTON_RIGHT, false);
                     setButtonState(BUTTON_LEFT, false);
                 }
-                if(knobPercentY > 0.2) {
+                if(knobPercentY > TOUCHPAD_THRESHOLD) {
                     setButtonState(BUTTON_UP, true);
                     setButtonState(BUTTON_DOWN, false);
                 }
-                else if(knobPercentY < -0.2) {
+                else if(knobPercentY < -TOUCHPAD_THRESHOLD) {
                     setButtonState(BUTTON_UP, false);
                     setButtonState(BUTTON_DOWN, true);
                 } else {

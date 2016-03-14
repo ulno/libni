@@ -1,1 +1,22 @@
-19877
+# Libni's Network Input Injector (nii) configuration file
+#
+# different types of receivers:
+# udp (specify port and receive on that or default port of 19877)
+# tcp (specify port and receive on that or default port of 19877)
+# mqtt (specify host and port - or assume mqtt default port and topic to read from)
+#
+# examples:
+# type: udp
+# port: 19877
+#
+# type: mqtt
+# host: 192.168.1.15
+# port: 1883
+# topic: iotempire/libni
+#
+
+type: mqtt
+host: 192.168.23.175
+topic: iotempire/libni
+
+#type: udp

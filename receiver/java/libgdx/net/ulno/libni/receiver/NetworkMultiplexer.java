@@ -1,21 +1,23 @@
 package net.ulno.libni.receiver;
 
+import org.eclipse.paho.client.mqttv3.*;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.yaml.snakeyaml.Yaml;
+
 import java.io.BufferedReader;
 import java.io.Reader;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by ulno on 22.02.16.
  */
 public class NetworkMultiplexer extends LibniReceiver implements LibniReceiverListener {
     public static final int MAX_BUFFER_SIZE = 256;
-    public static final int BUFFER_HEADER_SIZE=18;
+    public static final int BUFFER_HEADER_SIZE=16;
     public static final int MAX_NETWORK_CONTROLLERS=128;
     private Hashtable<NetworkReceiverID,NetworkReceiver> networkControllers = new Hashtable<>();
     private ArrayList<NetworkReceiverID> networkReceiverIDList = new ArrayList<>();
@@ -31,21 +33,60 @@ public class NetworkMultiplexer extends LibniReceiver implements LibniReceiverLi
     private DatagramSocket socket = null;
     //private DatagramPacket incoming = new DatagramPacket(messageBuffer, messageBuffer.length);
     private boolean finished = false;
+    private MqttClient mqttClient = null;
 
     public NetworkMultiplexer(Reader reader) {
         // init with contents of an external file
         int port = -1;
+        String host;
+        String topic;
 
-        try {
-            port = Integer.valueOf(new BufferedReader(reader).readLine().trim());
-            initUDP(port);
-        } catch (Exception e) {
-            //ignore and leave hostAndPort undefined
+        Yaml yaml = new Yaml();
+        Map<String, String> configMap = (Map<String, String>)  yaml.load(reader);
+        if(configMap.containsKey("type")) {
+            switch(configMap.get("type")) {
+                case "udp":
+                    try {
+                        port = Integer.valueOf(configMap.get("port"));
+                    } catch (Exception e) {
+                        port = 19877; // assume default port
+                    }
+                    initUDP(port);
+                    break;
+                case "tcp":
+                    try {
+                        port = Integer.valueOf(configMap.get("port"));
+                    } catch (Exception e) {
+                        port = 19877; // assume default port
+                    }
+                    initTCP(port);
+                    break;
+                case "mqtt":
+                    try {
+                        port = Integer.valueOf(configMap.get("port"));
+                    } catch (Exception e) {
+                        port = 1883; // assume default port
+                    }
+                    try {
+                        host = configMap.get("host");
+                        topic = configMap.get("topic");
+                    } catch (Exception e) {
+                        host = null;
+                        topic = null;
+                        System.out.println("Libni Config File Reader: Problem reading config file: cannnot read host or topic.");
+                    }
+                    if(host!=null) {
+                        initMQTT(host,port,topic);
+                    }
+                    break;
+                default:
+                    System.out.println("Libni Config File Reader: Problem reading config file: protocol " + configMap.get("type") + " unknown.");
+                    break;
+            }
         }
-
     }
 
-    void initUDP(int port ) {
+    void initUDP( int port ) {
         if (port > 0) {
             try {
                 //socket = new DatagramSocket(port);
@@ -55,8 +96,9 @@ public class NetworkMultiplexer extends LibniReceiver implements LibniReceiverLi
                 socket = channel.socket();
                 socket.bind(new InetSocketAddress(port));
             } catch (Exception e) {
-                System.out.println("NetworkReceiver:"+"Can't open socket."+ e.toString());
+                System.out.println("NetworkReceiver:" + "Can't open socket." + e.toString());
             }
+
 
             receiverThread = new Thread() {
                 @Override
@@ -100,6 +142,48 @@ public class NetworkMultiplexer extends LibniReceiver implements LibniReceiverLi
     }
 
     void initMQTT( String host, int port, String topic ) {
+        if(host != null) {
+            MemoryPersistence persistence = new MemoryPersistence();
+
+            class mqttSubscriber implements MqttCallback {
+
+                @Override
+                public void connectionLost(Throwable cause) {
+
+                }
+
+                @Override
+                public void messageArrived(String topic, MqttMessage message) throws Exception {
+                    byte[] payload = message.getPayload();
+                    messageSavedSize = payload.length;
+                    for(int i=messageSavedSize-1; i>=0; i--) { // just copy message for asynchrounous main thread
+                        messageSaved[i]=payload[i];
+                    }
+                }
+
+                @Override
+                public void deliveryComplete(IMqttDeliveryToken token) {
+
+                }
+            };
+
+            try {
+                mqttClient = new MqttClient("tcp://"+host+":"+port, MqttClient.generateClientId(), persistence);
+                MqttConnectOptions connOpts = new MqttConnectOptions();
+                connOpts.setCleanSession(true);
+                mqttClient.connect(connOpts);
+                mqttClient.setCallback(new mqttSubscriber());
+                mqttClient.subscribe(topic);
+            } catch(MqttException me) {
+                System.out.println("reason "+me.getReasonCode());
+                System.out.println("msg "+me.getMessage());
+                System.out.println("loc "+me.getLocalizedMessage());
+                System.out.println("cause "+me.getCause());
+                System.out.println("excep "+me);
+                me.printStackTrace();
+            }
+        }
+        // TODO: think about cleanup
     }
 
     /**

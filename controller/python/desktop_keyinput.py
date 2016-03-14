@@ -19,6 +19,7 @@ class Buttons(Enum):
 ####### constants for configuration
 CLIENT_ID =  "\0\0\0\1"
 import pygame # import basic pygame modules
+import paho.mqtt.client as mqtt # only works in virtual environment
 from pygame.locals import * # for key-symbols
 KEY_MAPPING = {
     K_0: '0',
@@ -53,7 +54,7 @@ NUMBER_OF_ANALOGS = 16
 NUMBER_OF_BUTTON_BYTES = (NUMBER_OF_BUTTONS + 7) / 8
 NUMBER_OF_ANALOGS_BYTES = NUMBER_OF_ANALOGS * 2
 MAX_BUFFER_SIZE = 128
-BUFFER_HEADER_SIZE=16
+BUFFER_HEADER_SIZE=18
 
 
 ######### other IMPORTS
@@ -84,6 +85,7 @@ destination_scheme = destination_config.scheme
 destination_host = destination_config.hostname
 destination_port = destination_config.port
 destination_path = destination_config.path
+mqtt_client = None
 
 # create reverse keymap
 reverse_keymap={}
@@ -115,16 +117,16 @@ version = struct.pack(">H",PROTOCOL_VERSION)
 for c in version:
     message[pos] = c
     pos += 1
-# pos = 8
+# pos = 6
 protocol_type = struct.pack(">H",config["protocol"])
 for c in protocol_type:
     message[pos] = c
     pos += 1
-# pos = 10
+# pos = 8 - (random) client id
 for c in range(4):
     message[pos] = random.randrange(256)
     pos += 1
-# pos = 4
+# pos = 12
 if not isinstance(CLIENT_ID, str):
     CLIENT_ID = struct.pack(">L",CLIENT_ID)
 else:
@@ -133,7 +135,7 @@ else:
 for c in CLIENT_ID:
     message[pos] = c
     pos += 1
-
+# pos = 16
 
 #### send functions for different protocols (schemes)
 def send_message_udp():
@@ -149,8 +151,8 @@ def send_message_tcp():
 
 
 def send_message_mqtt():
-    global message, message_filled
-    pass
+    global message, message_filled, mqtt_client
+    mqtt_client.publish(destination_path,message[0:message_filled])
 
 
 #### other pygame initialization
@@ -227,6 +229,10 @@ elif destination_config.scheme == "tcp":
     sender = send_message_tcp
 elif destination_config.scheme == "mqtt":
     sender = send_message_mqtt
+    mqtt_client = mqtt.Client()
+    if destination_port!=None and destination_port!="": mqtt_client.connect(destination_host,destination_port)
+    else: mqtt_client.connect(destination_host)
+    if destination_path.startswith("/"): destination_path = destination_path[1:]
 else:
     raise Exception("Destination scheme %s unknown." % destination_config.scheme)
 
