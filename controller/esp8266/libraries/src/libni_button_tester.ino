@@ -7,7 +7,8 @@ const char* SSID     = "iotempire";
 const char* PASSWORD = "internetofthings";
 const char* MQTT_SERVER = "ulno-work";
 const char* TOPIC = "iotempire/libni";
-const char* DESTINATION_HOST = "192.168.23.175";
+//const char* DESTINATION_HOST = "192.168.23.175";
+const char* DESTINATION_HOST = "192.168.15.100";
 const int MY_ID = 1; // controller id for identification
 
 const int STATUS_LED = 16;

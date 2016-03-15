@@ -15,8 +15,8 @@
 # topic: iotempire/libni
 #
 
-type: mqtt
-host: ulno-work
-topic: iotempire/libni
+#type: mqtt
+#host: ulno-work
+#topic: iotempire/libni
 
-#type: udp
+type: udp

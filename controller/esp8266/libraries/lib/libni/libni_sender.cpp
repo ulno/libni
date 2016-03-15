@@ -18,7 +18,7 @@ void Libni_Sender::init_header() {
     pos += 1;
   }
   u16_t version = htons(PROTOCOL_VERSION);
-  for(int i=0; i<4; i++) {
+  for(int i=0; i<2; i++) {
     message[pos] = ((char *)&version)[i];
     pos += 1;
   }
