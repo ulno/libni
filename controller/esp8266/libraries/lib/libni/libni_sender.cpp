@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "libni.h"
+#include "libni_sender.h"
 #include <lwip/ip.h> // for endian conversion htons, htonl, ...
 
 const int Libni_Sender::PROTOCOL_VERSION = 1;
@@ -9,7 +9,6 @@ const int Libni_Sender::NUMBER_OF_AXIS = 16;
 const int Libni_Sender::NUMBER_OF_AXIS_BYTES = Libni_Sender::NUMBER_OF_AXIS * 2;
 const int Libni_Sender::MAX_BUFFER_SIZE = 128;
 const int Libni_Sender::BUFFER_HEADER_SIZE = 16;
-const int Libni_Sender::DEFAULT_PORT = 19877;
 const char *Libni_Sender::MAGIC = "LBNI";
 
 void Libni_Sender::init_header() {
@@ -79,30 +78,20 @@ void Libni_Sender::message_add_analog(int analog_nr, long state ) {
 }
 
 void Libni_Sender::message_send() {
-  // Serial.println("sending UDP packet...");
-  udp.beginPacket(serverIP, destination_port);
-  udp.write(message, message_size);
-  udp.endPacket();
+  // This is virtual, should be not used.
+  Serial.println("Wrong (virtual) send method called.");
 }
 
-Libni_Sender::Libni_Sender(uint32_t client_id, const char *destination) {
-  init(client_id, destination, DEFAULT_PORT);
+Libni_Sender::Libni_Sender(uint32_t client_id) {
+  init(client_id);
 }
 
-Libni_Sender::Libni_Sender(uint32_t client_id, const char *destination, int port) {
-  init(client_id, destination,port);
-}
-
-void Libni_Sender::init(uint32_t client_id, const char *destination, int port) {
+void Libni_Sender::init(uint32_t client_id) {
   this->client_id = client_id;
-  destination_host = destination;
-  destination_port = port;
   message = new byte[MAX_BUFFER_SIZE];
   for(int i=0; i<MAX_BUFFER_SIZE; i++) {
     message[i]=0; // init
   }
-
-  WiFi.hostByName(destination_host, serverIP); // resolve name
 
   // init header
   init_header();
