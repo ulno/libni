@@ -36,11 +36,10 @@ public:
   virtual void message_send(); // send message
   Libni_Sender(uint32_t client_id);
 private:
-  uint32_t client_id;
-
   void init(uint32_t client_id);
   void init_header();
 protected:
+  uint32_t client_id;
   byte *message;
   int message_size;
 

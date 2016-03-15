@@ -16,4 +16,24 @@
 #include "libni_sender.h"
 #include <PubSubClient.h>
 
+/**
+ * Creates an object which sends the current key state to a libni receiver.
+ */
+class Libni_Mqtt : public Libni_Sender {
+public:
+  static const int DEFAULT_PORT;
+  Libni_Mqtt(uint32_t client_id, const char* destination_host, int port, const char* topic );
+  Libni_Mqtt(uint32_t client_id, const char* destination_host, const char* topic );
+  void message_send();
+private:
+  const char* destination_host;
+  const char* topic;
+  int destination_port;
+
+  PubSubClient* mqtt; 
+
+  void init_mqtt(const char* destination_host, int port, const char* topic);
+
+};
+
 #endif // libni_mqtt

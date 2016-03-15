@@ -1,16 +1,14 @@
 #include <Arduino.h>
 #include "libni_sender.h"
 #include "libni_udp.h"
-#include <lwip/ip.h> // for endian conversion htons, htonl, ...
-
 
 const int Libni_Udp::DEFAULT_PORT = 19877;
 
 void Libni_Udp::message_send() {
-  Serial.print("Sending UDP packet to ");
+  /*Serial.print("Sending UDP packet to ");
   Serial.print(serverIP.toString());
   Serial.print(":");
-  Serial.println(destination_port);
+  Serial.println(destination_port);*/
   udp.beginPacket(serverIP, destination_port);
   udp.write(message, message_size);
   udp.endPacket();

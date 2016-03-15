@@ -1,11 +1,11 @@
 #include "ulno_esp_utils.h"
-#include "libni_udp.h"
+//#include "libni_udp.h"
+#include "libni_mqtt.h"
 #include "ulno_buttons.h"
 
 // network related stuff
 const char* SSID     = "iotempire";
 const char* PASSWORD = "internetofthings";
-const char* MQTT_SERVER = "ulno-work";
 const char* TOPIC = "iotempire/libni";
 //const char* DESTINATION_HOST = "192.168.23.175";
 const char* DESTINATION_HOST = "192.168.15.100";
@@ -13,7 +13,7 @@ const int MY_ID = 1; // controller id for identification
 
 const int STATUS_LED = 16;
 Ulno_Buttons *tb;
-Libni_Udp *libni_sender;
+Libni_Mqtt *libni_sender;
 
 void initAllButtons() {
   tb->add_touch_button(Ulno_Buttons::FIRE,  4); // fire
@@ -35,7 +35,7 @@ void send() {
 
 void setup() {
   ulno_esp_init("Wire touch controller started.",SSID,PASSWORD);
-  libni_sender = new Libni_Udp(MY_ID,DESTINATION_HOST);
+  libni_sender = new Libni_Mqtt(MY_ID,DESTINATION_HOST,TOPIC);
   tb = new Ulno_Buttons(3, 8, 4, true, true); // better for aluminum than the defaults
   pinMode(STATUS_LED, OUTPUT);
   digitalWrite(STATUS_LED, LOW);
@@ -52,7 +52,7 @@ void loop() {
     digitalWrite(STATUS_LED, HIGH);
   }
   frames ++;
-  if(frames > 50) { // increase for network message debug, but lower to send more updates
+  if(frames > 4) { // increase for network message debug, but lower to send more updates
     frames = 0;
     send();
   }
