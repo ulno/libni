@@ -1,24 +1,28 @@
 #include "ulno_esp_utils.h"
-#include "libni.h"
-#include "libni_buttons.h"
+#include "libni_udp.h"
+//#include "libni_mqtt.h"
+#include "ulno_buttons.h"
 
 // network related stuff
-const char* ssid     = "iotempire";
-const char* password = "internetofthings";
-const char * DESTINATION_HOST = "192.168.23.175";
-const int MY_ID = 1; // controller id for identification
+const char* SSID     = "iotempire";
+const char* PASSWORD = "internetofthings";
+const char* TOPIC = "iotempire/libni";
+const char* DESTINATION_HOST = "192.168.23.175";
+const int MY_ID = 101; // controller id for identification
 
-const int STATUS_LED = 16;
-Libni_Buttons *tb;
-Libni_Sender *libni_sender;
+const int STATUS_LED = 2; // 16 on Espresso Lite 1 but 16 will reset on v2 -> use 2
+Ulno_Buttons *tb;
+//Libni_Mqtt *libni_sender;
+Libni_Udp *libni_sender;
 
 void initAllButtons() {
-  tb->add_touch_button(Libni_Buttons::FIRE,  4); // fire
-  tb->add_touch_button(Libni_Buttons::DOWN,  5); // down
-  tb->add_touch_button(Libni_Buttons::LEFT, 12); // left
-  tb->add_touch_button(Libni_Buttons::RIGHT,13); // right
-  tb->add_touch_button(Libni_Buttons::UP,   14); // up
-  //tb->add_touch_button(16,15); // up 15 is pulled down all the time as it seems -> does not work easily
+  tb->add_touch_button(Ulno_Buttons::RIGHT,  4); // right
+  tb->add_touch_button(Ulno_Buttons::DOWN,  5); // down
+  tb->add_touch_button(Ulno_Buttons::LEFT, 12); // left
+//  tb->add_touch_button(Ulno_Buttons::RIGHT,13); // does not work
+  tb->add_touch_button(Ulno_Buttons::UP,   14); // up
+  // up 15 is pulled down all the time as it seems -> does not work easily
+  //tb->add_push_button(16,15,false);
 }
 
 void send() {
@@ -30,9 +34,10 @@ void send() {
 }
 
 void setup() {
-  ulno_esp_init("Wire touch controller started.",ssid,password);
-  libni_sender = new Libni_Sender(MY_ID,DESTINATION_HOST);
-  tb = new Libni_Buttons(3, 8, 1, true, true); // better for aluminum than the defaults
+  ulno_esp_init("Wire touch controller started.",SSID,PASSWORD);
+//  libni_sender = new Libni_Mqtt(MY_ID,DESTINATION_HOST,TOPIC);
+  libni_sender = new Libni_Udp(MY_ID,DESTINATION_HOST);
+  tb = new Ulno_Buttons(3, 8, 4, true, true); // better for aluminum than the defaults
   pinMode(STATUS_LED, OUTPUT);
   digitalWrite(STATUS_LED, LOW);
 
@@ -48,7 +53,7 @@ void loop() {
     digitalWrite(STATUS_LED, HIGH);
   }
   frames ++;
-  if(frames > 50) {
+  if(frames > 4) { // increase for network message debug, but lower to send more updates
     frames = 0;
     send();
   }

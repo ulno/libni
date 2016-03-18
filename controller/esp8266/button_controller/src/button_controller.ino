@@ -1,24 +1,30 @@
 #include "ulno_esp_utils.h"
-#include "libni.h"
+#include "libni_udp.h"
 #include "ulno_buttons.h"
 
 // network related stuff
 const char* ssid     = "iotempire";
 const char* password = "internetofthings";
 const char * DESTINATION_HOST = "192.168.23.175";
-const int MY_ID = 1; // controller id for identification
+const int MY_ID = 12; // controller id for identification
 
 const int STATUS_LED = 16;
 Ulno_Buttons *tb;
-Libni_Sender *libni_sender;
+Libni_Udp *libni_sender;
 
 void initAllButtons() {
-  tb->add_push_button('q',  4); // fire
-  tb->add_push_button('s',  5); // down
-  tb->add_push_button('a', 12); // left
-  tb->add_push_button('d', 13); // right
-  tb->add_push_button('w', 14); // up
-  tb->add_push_button(Ulno_Buttons::ESCAPE,15,false); // up 15 is pulled down all the time as it seems -> does not work easily
+//  tb->add_push_button('q',  4); // fire
+//  tb->add_push_button('s',  5); // down
+//  tb->add_push_button('a', 12); // left
+//  tb->add_push_button('d', 13); // right
+//  tb->add_push_button('w', 15, false); // // up 15 is pulled down all the time as it seems -> does not work easily
+//  tb->add_push_button(Ulno_Buttons::ESCAPE,14);
+  tb->add_push_button(Ulno_Buttons::FIRE,  4); // fire
+  tb->add_push_button(Ulno_Buttons::DOWN,  5); // down
+  tb->add_push_button(Ulno_Buttons::LEFT, 12); // left
+  tb->add_push_button(Ulno_Buttons::RIGHT, 13); // right
+  tb->add_push_button(Ulno_Buttons::UP, 15, false); // // up 15 is pulled down all the time as it seems -> does not work easily
+  tb->add_push_button(Ulno_Buttons::ESCAPE,14);
 }
 
 void send() {
@@ -31,7 +37,7 @@ void send() {
 
 void setup() {
   ulno_esp_init("Wire touch controller started.",ssid,password);
-  libni_sender = new Libni_Sender(MY_ID,DESTINATION_HOST);
+  libni_sender = new Libni_Udp(MY_ID,DESTINATION_HOST);
   tb = new Ulno_Buttons(); // defaults are fine for normal buttons
   pinMode(STATUS_LED, OUTPUT);
   digitalWrite(STATUS_LED, LOW);
@@ -48,7 +54,7 @@ void loop() {
     digitalWrite(STATUS_LED, HIGH);
   }
   frames ++;
-  if(frames > 50) {
+  if(frames > 4) {
     frames = 0;
     send();
   }

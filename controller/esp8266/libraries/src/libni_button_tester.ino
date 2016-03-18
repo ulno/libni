@@ -1,6 +1,6 @@
 #include "ulno_esp_utils.h"
-//#include "libni_udp.h"
-#include "libni_mqtt.h"
+#include "libni_udp.h"
+//#include "libni_mqtt.h"
 #include "ulno_buttons.h"
 
 // network related stuff
@@ -8,18 +8,19 @@ const char* SSID     = "iotempire";
 const char* PASSWORD = "internetofthings";
 const char* TOPIC = "iotempire/libni";
 //const char* DESTINATION_HOST = "192.168.23.175";
-const char* DESTINATION_HOST = "192.168.15.100";
+const char* DESTINATION_HOST = "192.168.23.123";
 const int MY_ID = 1; // controller id for identification
 
-const int STATUS_LED = 16;
+const int STATUS_LED = 2; // 16 on Espresso Lite 1 but 16 will reset on v2 -> use 2
 Ulno_Buttons *tb;
-Libni_Mqtt *libni_sender;
+//Libni_Mqtt *libni_sender;
+Libni_Udp *libni_sender;
 
 void initAllButtons() {
-  tb->add_touch_button(Ulno_Buttons::FIRE,  4); // fire
+  tb->add_touch_button(Ulno_Buttons::RIGHT,  4); // fire
   tb->add_touch_button(Ulno_Buttons::DOWN,  5); // down
   tb->add_touch_button(Ulno_Buttons::LEFT, 12); // left
-  tb->add_touch_button(Ulno_Buttons::RIGHT,13); // right
+//  tb->add_touch_button(Ulno_Buttons::RIGHT,13); // does not work
   tb->add_touch_button(Ulno_Buttons::UP,   14); // up
   // up 15 is pulled down all the time as it seems -> does not work easily
   //tb->add_push_button(16,15,false);
@@ -35,7 +36,8 @@ void send() {
 
 void setup() {
   ulno_esp_init("Wire touch controller started.",SSID,PASSWORD);
-  libni_sender = new Libni_Mqtt(MY_ID,DESTINATION_HOST,TOPIC);
+//  libni_sender = new Libni_Mqtt(MY_ID,DESTINATION_HOST,TOPIC);
+  libni_sender = new Libni_Udp(MY_ID,DESTINATION_HOST);
   tb = new Ulno_Buttons(3, 8, 4, true, true); // better for aluminum than the defaults
   pinMode(STATUS_LED, OUTPUT);
   digitalWrite(STATUS_LED, LOW);

@@ -23,7 +23,8 @@ void ulno_esp_init_wifi(const char *essid, const char* psk) {
 }
 
 void ulno_esp_init(const char* hello, const char *essid, const char* psk) {
-  Serial.begin(230400);
+//  Serial.begin(230400);
+  Serial.begin(115200);
   delay(10);
 
   Serial.println(hello);
