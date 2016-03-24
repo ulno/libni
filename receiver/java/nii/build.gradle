@@ -31,3 +31,14 @@ task run(dependsOn: classes, type: JavaExec) {
     workingDir = project.assetsDir
     ignoreExitValue = true
 }
+
+task buildJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'nii',
+                'Implementation-Version': version,
+                'Main-Class': 'net.ulno.nii.Main'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
