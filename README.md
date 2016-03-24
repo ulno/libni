@@ -8,13 +8,13 @@ from networked input devices.
 In a Libni setup there are usually two type of devices:
 
 1. Controllers: the devices which send network updates. Controllers usually have buttons and/or some 
-   analog sensors (sliders, turn knobs, gyroscopes). These coudl also be
-   modern, unthought of input deveices to augment your VR or AR expereince, like addons
-   for your Oculus Rift or Googel Cardboard.
+   analog sensors (sliders, turn knobs, gyroscopes). These could also be
+   modern, unsought of input devices to augment your VR or AR experience, like addons
+   for your Oculus Rift or Google Cardboard.
 
-2. Receivers: These devices receive the inputs from the controllers and
-   act depending on them. These could be games with th elibni receiver library,
-   a drone or other remote controleld vehicle, or the nii (Network Input Injector),
+2. Receivers: these devices receive the inputs from the controllers and
+   act depending on them. These could be games with the libni receiver library,
+   a drone or other remote controlled vehicle, or the nii (Network Input Injector),
    turning the received signals into keystrokes and mouse events.
 
 Libni enabled controllers send about every 10-20ms packages with update on all sensors it
@@ -58,8 +58,10 @@ You can send the packages via udp, tcp, or mqtt (tcp does not yet work
 in all projects).
 
 This is the current structure of the libni-project:
+
+```
 /controller - examples for libni controllers (esp, libgdx, ...)
-  /bash -a small socat script to just send udp-data somewhere
+  /bash - a small socat script to just send udp-data somewhere
   /esp8266 - examples for esp8266 (including my touch library)
   /libgdx - a small virtual joystick for desktop or mobile phone
 simulating a joystick and a fire button
@@ -67,6 +69,6 @@ simulating a joystick and a fire button
 
 /receiver - example for receivers
   /java - libgdx receiver library and nii - java network input injector
-  /python - skeleton for a potetial receiver in python
+  /python - skeleton for a potential receiver in python
   /shell - a small socat script to just dump the udp-data on the screen
-
+```
