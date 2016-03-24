@@ -59,16 +59,15 @@ in all projects).
 
 This is the current structure of the libni-project:
 
-```
-/controller - examples for libni controllers (esp, libgdx, ...)
-  /bash - a small socat script to just send udp-data somewhere
-  /esp8266 - examples for esp8266 (including my touch library)
-  /libgdx - a small virtual joystick for desktop or mobile phone
-simulating a joystick and a fire button
-  /python - a test desktop client similar to the libgdx client
-
-/receiver - example for receivers
-  /java - libgdx receiver library and nii - java network input injector
-  /python - skeleton for a potential receiver in python
-  /shell - a small socat script to just dump the udp-data on the screen
-```
+    /controller - examples for libni controllers (esp, libgdx, ...)
+      /bash - a small socat script to just send udp-data somewhere
+      /esp8266 - examples for esp8266 (including my touch library)
+      /libgdx - a small virtual joystick for desktop or mobile phone
+    simulating a joystick and a fire button
+      /python - a test desktop client similar to the libgdx client
+    
+    /receiver - example for receivers
+      /java - libgdx receiver library and nii - java network input injector
+      /python - skeleton for a potential receiver in python
+      /shell - a small socat script to just dump the udp-data on the screen
+    
