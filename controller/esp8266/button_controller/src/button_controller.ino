@@ -5,7 +5,7 @@
 // network related stuff
 const char* ssid     = "iotempire";
 const char* password = "internetofthings";
-const char * DESTINATION_HOST = "192.168.23.175";
+const char * DESTINATION_HOST = "192.168.23.123";
 const int MY_ID = 12; // controller id for identification
 
 const int STATUS_LED = 16;
@@ -19,12 +19,27 @@ void initAllButtons() {
 //  tb->add_push_button('d', 13); // right
 //  tb->add_push_button('w', 15, false); // // up 15 is pulled down all the time as it seems -> does not work easily
 //  tb->add_push_button(Ulno_Buttons::ESCAPE,14);
+
   tb->add_push_button(Ulno_Buttons::FIRE,  4); // fire
   tb->add_push_button(Ulno_Buttons::DOWN,  5); // down
   tb->add_push_button(Ulno_Buttons::LEFT, 12); // left
   tb->add_push_button(Ulno_Buttons::RIGHT, 13); // right
   tb->add_push_button(Ulno_Buttons::UP, 15, false); // // up 15 is pulled down all the time as it seems -> does not work easily
-  tb->add_push_button(Ulno_Buttons::ESCAPE,14);
+
+  // // ulno
+  // tb->add_push_button(Ulno_Buttons::UP,   4);
+  // tb->add_push_button(Ulno_Buttons::RIGHT, 5);
+  // tb->add_push_button(Ulno_Buttons::DOWN, 12);
+  // tb->add_push_button(Ulno_Buttons::FIRE, 13);
+  // tb->add_push_button(Ulno_Buttons::LEFT, 14);
+
+  // ben
+//  tb->add_push_button(Ulno_Buttons::UP,    4);
+//  tb->add_push_button(Ulno_Buttons::LEFT,  5);
+//  tb->add_push_button(Ulno_Buttons::RIGHT,12);
+//  tb->add_push_button(Ulno_Buttons::DOWN, 13);
+//  tb->add_push_button(Ulno_Buttons::FIRE, 14);
+
 }
 
 void send() {
