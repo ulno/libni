@@ -37,8 +37,12 @@ public class GdxMergedInput implements InputProcessor, ControllerListener, Libni
         initInputMultiplexer();
         keyboardController = new GdxKeyboardReceiver(gdxKeyboardMapping);
         keyboardController.setLibniControllerListener(this);
-        networkMultiplexer = new NetworkMultiplexer(networkConfig.reader());
-        networkMultiplexer.setLibniControllerListener(this);
+        try {
+            networkMultiplexer = new NetworkMultiplexer(networkConfig.reader());
+            networkMultiplexer.setLibniControllerListener(this);
+        } catch (Exception e) {
+            // ignore
+        }
         gdxControllerMultiplexer = new GdxReceiverMultiplexer(gdxReceiverMapping);
         gdxControllerMultiplexer.setLibniControllerListener(this);
     }
@@ -104,7 +108,8 @@ public class GdxMergedInput implements InputProcessor, ControllerListener, Libni
      */
     public void evaluate() {
         keyboardController.evaluate();
-        networkMultiplexer.evaluate();
+        if(networkMultiplexer != null)
+            networkMultiplexer.evaluate();
         gdxControllerMultiplexer.evaluate();
     }
 
@@ -125,10 +130,16 @@ public class GdxMergedInput implements InputProcessor, ControllerListener, Libni
     ////////// Libni listening methods
     @Override
     public void buttonUpdated(int button, boolean pressed) {
+        boolean onePressed;
+
         // merge from three types of controllers
-        boolean onePressed = keyboardController.getButton(button)
-                || networkMultiplexer.getButton(button)
-                || gdxControllerMultiplexer.getButton(button);
+        if(networkMultiplexer!=null)
+            onePressed = keyboardController.getButton(button)
+                    || networkMultiplexer.getButton(button)
+                    || gdxControllerMultiplexer.getButton(button);
+        else
+            onePressed = keyboardController.getButton(button)
+                    || gdxControllerMultiplexer.getButton(button);
         if(mergedButtons[button] != onePressed) {
             mergedButtons[button] = onePressed;
             if(listener != null) {

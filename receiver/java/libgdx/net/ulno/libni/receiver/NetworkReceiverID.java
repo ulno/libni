@@ -26,6 +26,8 @@ public class NetworkReceiverID {
 
     @Override
     public int hashCode() {
-        return Long.hashCode(sessionID+clientID);
+        // doesn't work in Android return Long.hashCode(sessionID+clientID);
+        return (int)(sessionID+clientID); // can use the ids
     }
+
 }
