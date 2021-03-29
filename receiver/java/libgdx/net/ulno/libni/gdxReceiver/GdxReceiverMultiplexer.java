@@ -1,7 +1,6 @@
 package net.ulno.libni.gdxReceiver;
 
 import com.badlogic.gdx.controllers.Controllers;
-import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.utils.Array;
 import net.ulno.libni.receiver.LibniReceiver;
 
@@ -42,34 +41,34 @@ public class GdxReceiverMultiplexer extends LibniReceiver { // TODO: add later a
             com.badlogic.gdx.controllers.Controller c = controllers.get(i);
             int povCode = 0;
             switch(unmappedButtonNr) {
-                case POV_CENTER:
-                    // this needs to disable all pov-buttons
-                    pressed = false; // center can't be pressed
-                    break;
-                case POV_NORTH:
-                    pressed |= c.getPov(povCode) == PovDirection.north;
-                    break;
-                case POV_NORTHEAST:
-                    pressed |= c.getPov(povCode) == PovDirection.northEast;
-                    break;
-                case POV_EAST:
-                    pressed |= c.getPov(povCode) == PovDirection.east;
-                    break;
-                case POV_SOUTHEAST:
-                    pressed |= c.getPov(povCode) == PovDirection.southEast;
-                    break;
-                case POV_SOUTH:
-                    pressed |= c.getPov(povCode) == PovDirection.south;
-                    break;
-                case POV_SOUTHWEST:
-                    pressed |= c.getPov(povCode) == PovDirection.southWest;
-                    break;
-                case POV_WEST:
-                    pressed |= c.getPov(povCode) == PovDirection.west;
-                    break;
-                case POV_NORTHWEST:
-                    pressed |= c.getPov(povCode) == PovDirection.northWest;
-                    break;
+//                case POV_CENTER:
+//                    // this needs to disable all pov-buttons
+//                    pressed = false; // center can't be pressed
+//                    break;
+//                case POV_NORTH:
+//                    pressed |= c.getPov(povCode) == PovDirection.north;
+//                    break;
+//                case POV_NORTHEAST:
+//                    pressed |= c.getPov(povCode) == PovDirection.northEast;
+//                    break;
+//                case POV_EAST:
+//                    pressed |= c.getPov(povCode) == PovDirection.east;
+//                    break;
+//                case POV_SOUTHEAST:
+//                    pressed |= c.getPov(povCode) == PovDirection.southEast;
+//                    break;
+//                case POV_SOUTH:
+//                    pressed |= c.getPov(povCode) == PovDirection.south;
+//                    break;
+//                case POV_SOUTHWEST:
+//                    pressed |= c.getPov(povCode) == PovDirection.southWest;
+//                    break;
+//                case POV_WEST:
+//                    pressed |= c.getPov(povCode) == PovDirection.west;
+//                    break;
+//                case POV_NORTHWEST:
+//                    pressed |= c.getPov(povCode) == PovDirection.northWest;
+//                    break;
                 case BUTTON1:
                     pressed |= c.getButton(0);
                     break;
